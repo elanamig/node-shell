@@ -1,78 +1,71 @@
 var fs = require('fs');
+var request = require('request');
 
-function date(value) { process.stdout.write(new Date().toString()) }
+function date(value, done) { done(new Date().toString()) }
 
-function pwd(value) { process.stdout.write(__dirname.toString()) }
+function pwd(value, done) { done(__dirname.toString()) }
 
-function ls(value) {
+function ls(value, done) {
   fs.readdir('.', function(err, files) {
     if (err) throw err;
-    files.forEach(function(file) {
-      process.stdout.write(file.toString() + "\n");
-    })
-    process.stdout.write("prompt > ");
+    done(files.join('\n'));
   });
 }
 
-function echo (input) {
-  process.stdout.write(input);
+function echo (input, done) {
+  done(input);
 }
 
-function cat (file) {
+function cat (file, done) {
   fs.readFile(file, function(err, data) {
     if (err) throw err;
-    process.stdout.write(data + "\n");
-    process.stdout.write("prompt > ");
+    done(data + "\n");
   });
 }
 
-function head (file) {
+function head (file, done) {
   fs.readFile(file, function(err, data) {
     if (err) throw err;
     var splitData = data.toString().split("\n");
 
     var headStuff = splitData.slice(0,5).join("\n");
 
-    process.stdout.write(headStuff + "\n");
-    process.stdout.write("prompt > ");
+    done(headStuff + "\n");
   });
 }
 
-function tail (file) {
+function tail (file, done) {
   fs.readFile(file, function(err, data) {
     if (err) throw err;
     var splitData = data.toString().split("\n");
 
     var tailStuff = splitData.slice(-6).join("\n");
 
-    process.stdout.write(tailStuff);
-    process.stdout.write("prompt > ");
+    done(tailStuff);
   });
 }
 
-function sort(file) {
+function sort(file, done) {
   fs.readFile(file, function(err, data) {
     if (err) throw err;
     var splitData = data.toString().split("\n");
 
     var sortStuff = splitData.sort().join("\n");
 
-    process.stdout.write(sortStuff);
-    process.stdout.write("prompt > ");
+    done(sortStuff);
   });
 }
 
-function wc(file) {
+function wc(file, done) {
   fs.readFile(file, function(err, data) {
     if (err) throw err;
     var splitData = data.toString().split("\n");
 
-    process.stdout.write(splitData.length + "\n");
-    process.stdout.write("prompt > ");
+    done(splitData.length + "\n");
   });
 }
 
-function uniq (file) {
+function uniq (file, done) {
   fs.readFile(file, function(err, data) {
     if (err) throw err;
     var splitData = data.toString().split("\n");
@@ -81,9 +74,19 @@ function uniq (file) {
       return line !== splitData[idx-1]
     }).join("\n");
 
-    process.stdout.write(noDupes);
-    process.stdout.write("prompt > ");
+    done(noDupes);
   });
+}
+
+function curl(url, done) {
+  request(url, function (error, response, body) {
+    if (error) throw error;
+    else done(body + '\n');
+  });
+}
+
+function find(dir, done) {
+
 }
 
 module.exports = {
@@ -96,5 +99,7 @@ module.exports = {
   tail,
   sort,
   wc,
-  uniq
+  uniq,
+  curl,
+  find
 }
