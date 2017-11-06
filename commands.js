@@ -86,6 +86,24 @@ function curl(url, done) {
 }
 
 function find(dir, done) {
+  fs.readdir('.', function(err, files) {
+    if (err) throw err;
+
+    if (dir != '.') {
+      if (files.indexOf(dir)!=-1) {
+        fs.readdir(dir, function(err, files) {
+          if (err) throw err;
+          done(files.join('\n'));
+        });
+      } else {
+        console.log('=======>' +dir);
+        files.filter(elem => fs.statSync (elem).isDirectory()).forEach(elem => find(elem, done));
+      }
+    } else {
+      done(files.join('\n'));
+    }
+
+  });
 
 }
 
